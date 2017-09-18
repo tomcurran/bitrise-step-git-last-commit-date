@@ -1,6 +1,6 @@
 # Git Last Commit Date
 
-tmp
+Reads the date of the last git commit, then export that data to environemnt variables LAST_COMMIT_DATE and LAST_COMMIT_DATE_NUMBERS.
 
 
 ## How to use this Step

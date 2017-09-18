@@ -1,22 +1,19 @@
 #!/bin/bash
-set -ex
 
-echo "This is the value specified for the input 'example_step_input': ${example_step_input}"
+# exit if a command fails
+set -e
 
-#
-# --- Export Environment Variables for other Steps:
-# You can export Environment Variables for other Steps with
-#  envman, which is automatically installed by `bitrise setup`.
-# A very simple example:
-envman add --key EXAMPLE_STEP_OUTPUT --value 'the value you want to share'
-# Envman can handle piped inputs, which is useful if the text you want to
-# share is complex and you don't want to deal with proper bash escaping:
-#  cat file_with_complex_input | envman add --KEY EXAMPLE_STEP_OUTPUT
-# You can find more usage examples on envman's GitHub page
-#  at: https://github.com/bitrise-io/envman
+LAST_COMMIT_DATE=`git show -s --format=%ci`
+envman add --key LAST_COMMIT_DATE --value "$LAST_COMMIT_DATE"
+echo " (i) Last commit date: ${LAST_COMMIT_DATE} -> Saved to \$LAST_COMMIT_DATE environment variable."
 
-#
-# --- Exit codes:
-# The exit code of your Step is very important. If you return
-#  with a 0 exit code `bitrise` will register your Step as "successful".
-# Any non zero exit code will be registered as "failed" by `bitrise`.
+REGEX_DATE_NUMBERS="[0-9][0-9]([0-9][0-9])-([0-9][0-9])-([0-9][0-9]) ([0-9][0-9]):([0-9][0-9])"
+if [[ $LAST_COMMIT_DATE =~ $REGEX_DATE_NUMBERS ]]; then
+    LAST_COMMIT_DATE_NUMBERS=${BASH_REMATCH[1]}${BASH_REMATCH[2]}${BASH_REMATCH[3]}${BASH_REMATCH[4]}${BASH_REMATCH[5]}
+else
+    echo " [!] Could not parse numbers from last commit date!"
+    exit 1
+fi
+
+envman add --key LAST_COMMIT_DATE_NUMBERS --value "$LAST_COMMIT_DATE_NUMBERS"
+echo " (i) Last commit date numbers: ${LAST_COMMIT_DATE_NUMBERS} -> Saved to \$LAST_COMMIT_DATE_NUMBERS environment variable."
